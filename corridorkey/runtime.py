@@ -204,6 +204,11 @@ def apply_auto_vram(cfg: InferenceConfig, shape_hw, num_frames: int) -> None:
 def prepare_runtime_environment(paths: RuntimePaths) -> None:
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
     os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+    if torch.version.hip is not None:
+        # MIOpen lacks fast solvers for several of these convs (depthwise,
+        # large-kernel transposed) and its first-run tuning takes minutes;
+        # PyTorch's native kernels are faster and numerically equivalent.
+        torch.backends.cudnn.enabled = False
     moge_root = paths.package_root / "third_party/MoGe"
     if str(moge_root) not in sys.path:
         sys.path.insert(0, str(moge_root))

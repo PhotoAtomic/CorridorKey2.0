@@ -747,7 +747,7 @@ def _sdpa_with_region_ids(
                 v.index_select(0, full_idx),
                 dropout_p=0.0,
                 is_causal=False,
-            ),
+            ).to(out.dtype),
         )
 
     partial = torch.nonzero(~full, as_tuple=False).flatten()
@@ -781,7 +781,7 @@ def _sdpa_with_region_ids(
             dropout_p=0.0,
             is_causal=False,
         )
-        out_nlhd[win_idx[:, None], token_idx[None, :]] = attn.permute(0, 2, 1, 3)
+        out_nlhd[win_idx[:, None], token_idx[None, :]] = attn.permute(0, 2, 1, 3).to(out.dtype)
     return out
 
 
@@ -906,7 +906,7 @@ def _sdpa_with_region_groups(
                 v.index_select(0, win_idx),
                 dropout_p=0.0,
                 is_causal=False,
-            ),
+            ).to(out.dtype),
         )
     if not groups:
         return out
@@ -922,7 +922,7 @@ def _sdpa_with_region_groups(
             dropout_p=0.0,
             is_causal=False,
         )
-        out_nlhd[win_idx[:, None], token_idx[None, :]] = attn.permute(0, 2, 1, 3)
+        out_nlhd[win_idx[:, None], token_idx[None, :]] = attn.permute(0, 2, 1, 3).to(out.dtype)
     return out
 
 
